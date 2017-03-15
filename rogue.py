@@ -1,3 +1,5 @@
+# Author: Rouven Haertel
+
 import libtcodpy as libtcod
 
 # Constant Variables:
