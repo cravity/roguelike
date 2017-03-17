@@ -1,4 +1,4 @@
-# Author: Rouven Haertel
+# Author: cravity
 
 import libtcodpy as libtcod
 
