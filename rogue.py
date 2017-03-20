@@ -7,38 +7,7 @@ import libtcodpy as libtcod
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 LIMIT_FPS = 20
-# Makes Player spawn in the center of the screen
-playerx = SCREEN_WIDTH/2
-playery = SCREEN_HEIGHT/2
 
-# Set Font:
-libtcod.console_set_custom_font(
-    'arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-
-def handle_keys():
-    global playerx, playery
-    key = libtcod.console_wait_for_keypress(True)
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
-        # Alt + Enter toggle fullscreen
-        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
-    elif key.vk == libtcod.KEY_ESCAPE:
-        return True # exit game
-
-    #movement keys
-    if libtcod.console_is_key_pressed(libtcod.KEY_UP):
-        playery -= 1
-
-    elif libtcod.console_is_key_pressed(libtcod.KEY_DOWN):
-        playery += 1
-
-    elif libtcod.console_is_key_pressed(libtcod.KEY_LEFT):
-        playerx -= 1
-
-    elif libtcod.console_is_key_pressed(libtcod.KEY_RIGHT):
-        playerx += 1
-
-# Objects
 class Object:
     # This is a generic object: The player, a monster, an item, the stairs...
     # It is always represented by a character on screen
@@ -63,20 +32,64 @@ class Object:
         # erase the character that represents this object
         libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
 
+def handle_keys():
+    key = libtcod.console_wait_for_keypress(True)
+    if key.vk == libtcod.KEY_ENTER and key.lalt:
+        # Alt + Enter toggle fullscreen
+        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+    elif key.vk == libtcod.KEY_ESCAPE:
+        return True # exit game
+
+    #movement keys
+    if libtcod.console_is_key_pressed(libtcod.KEY_UP):
+        player.move(0, -1)
+
+    elif libtcod.console_is_key_pressed(libtcod.KEY_DOWN):
+        player.move(0, 1)
+
+    elif libtcod.console_is_key_pressed(libtcod.KEY_LEFT):
+        player.move(-1, 0)
+
+    elif libtcod.console_is_key_pressed(libtcod.KEY_RIGHT):
+        player.move(1, 0)
+
+
+
+# Objects
 #### START OF GAME CODE ###
+
+# Set Font:
+libtcod.console_set_custom_font(
+    'arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 # Window Initilazing:
 libtcod.console_init_root(
     SCREEN_WIDTH, SCREEN_HEIGHT, 'Alice in Wonderland (WIP)', False)
 con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+# Create an object representing the player
+player = Object(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, "@", libtcod.white)
+
+# Create an NPC
+npc = Object(SCREEN_WIDTH/2 - 5, SCREEN_HEIGHT/2, "@", libtcod.yellow)
+
+objects = [npc, player]
+
 # Main Loop:
 while not libtcod.console_is_window_closed():
-    libtcod.console_set_default_background(0, libtcod.white)
-    libtcod.console_put_char(con, playerx, playery, '@', libtcod.BKGND_NONE)
+
+    # draw all objects in the list
+    for object in objects:
+        object.draw()
+
+    # Blit the contents of con to the root console and present it
     libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
     libtcod.console_flush()
+
+    # Erase all objects at their old location, before they move
+    for object in objects:
+        object.clear()
     # handle keys and exit game if needed
-    libtcod.console_put_char(con, playerx, playery, ' ', libtcod.BKGND_NONE)
     exit = handle_keys()
     if exit:
         break
