@@ -6,7 +6,24 @@ import libtcodpy as libtcod
 # Actual size of window:
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
+
+# Size of the map
+MAP_WIDTH = 80
+MAP_HEIGHT = 45
+
 LIMIT_FPS = 20
+
+color_dark_wall = libtcod.Color(0, 0, 100)
+color_dark_ground = libtcod.Color(50, 50, 150)
+
+class Tile:
+    # A tile of the map and its properties
+    def __init__(self, blocked, block_sight = None):
+        self.blocked = blocked
+
+        # by default, if a tile is blocked, it also blocks sight
+        if block_sight is None: block_sight = blocked
+        self.block_sight = block_sight
 
 class Object:
     # This is a generic object: The player, a monster, an item, the stairs...
