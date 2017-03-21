@@ -35,9 +35,10 @@ class Object:
         self.color = color
 
     def move(self, dx, dy):
-        # Move by the given amount
-        self.x += dx
-        self.y += dy
+        # Move by the given amounta if the destination is not blocked
+        if not map[self.x + dx][self.y + dy].blocked:
+            self.x += dx
+            self.y += dy
 
     def draw(self):
         # set the color, then draw this character at its position
@@ -48,6 +49,40 @@ class Object:
     def clear(self):
         # erase the character that represents this object
         libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
+
+def make_map():
+    global map
+
+    # fill map with "unblocked" tiles
+    map = [[ Tile(False)
+        for y in range(MAP_HEIGHT) ]
+           for x in range(MAP_WIDTH) ]
+
+    # Add two pillars as test
+    map[30][22].blocked = True
+    map[30][22].block_sight = True
+    map[50][22].blocked = True
+    map[50][22].block_sight = True
+
+def render_all():
+    global color_light_wall
+    global color_light_ground
+
+    # go through all tiles and set their backround color
+    for y in range(MAP_HEIGHT):
+        for x in range(MAP_WIDTH):
+            wall = map[x][y].block_sight
+            if wall:
+                libtcod.console_set_char_background(con, x, y, color_dark_wall, libtcod.BKGND_SET )
+            else:
+                libtcod.console_set_char_background(con, x, y, color_dark_ground, libtcod.BKGND_SET )
+
+    # Draw all objects in the list
+    for object in objects:
+        object.draw()
+
+    # Blit the contents of con to the root console and present it
+    libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
 
 def handle_keys():
     key = libtcod.console_wait_for_keypress(True)
@@ -92,15 +127,15 @@ npc = Object(SCREEN_WIDTH/2 - 5, SCREEN_HEIGHT/2, "@", libtcod.yellow)
 
 objects = [npc, player]
 
+# generate map ( at this point it's not drawn on the screen )
+make_map()
+
 # Main Loop:
 while not libtcod.console_is_window_closed():
 
-    # draw all objects in the list
-    for object in objects:
-        object.draw()
+    # render the screen
+    render_all()
 
-    # Blit the contents of con to the root console and present it
-    libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
     libtcod.console_flush()
 
     # Erase all objects at their old location, before they move
