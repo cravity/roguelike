@@ -25,6 +25,14 @@ class Tile:
         if block_sight is None: block_sight = blocked
         self.block_sight = block_sight
 
+class Rect:
+    # A rectangle on the map. Used to characterize a room
+    def __init__(self, x, y, w, h):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+
 class Object:
     # This is a generic object: The player, a monster, an item, the stairs...
     # It is always represented by a character on screen
@@ -61,6 +69,10 @@ def make_map():
     # Add two pillars as test
     map[30][22].blocked = True
     map[30][22].block_sight = True
+    map[30][21].blocked = True
+    map[30][21].block_sight = True
+    map[30][20].blocked = True
+    map[30][20].block_sight = True
     map[50][22].blocked = True
     map[50][22].block_sight = True
 
